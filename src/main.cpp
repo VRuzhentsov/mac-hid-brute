@@ -7,17 +7,38 @@
 #include "Arduino.h"
 #include "Keyboard.h"
 
+#include "WifiCredentials.h"
+
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
 
 int currentPassword = 0;
+bool incrementationIsRunning = true;
 
 void short_blink() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(100);
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
+}
+
+void increment(){
+  if(currentPassword <= 999999) {
+    String password = String(currentPassword);
+    while (password.length() < 6) {
+      password = "0" + password; // If the number has less than 6 digits, prepend 0s to it
+    }
+    Keyboard.println(password);
+
+    short_blink();
+
+    delay(10000);
+
+    currentPassword++; // Increase the password by 1
+  } else {
+    incrementationIsRunning = false;
+  }
 }
 
 void setup()
@@ -31,20 +52,9 @@ void setup()
 
 void loop()
 {
-  if(currentPassword <= 999999) {
-    String password = String(currentPassword);
-    while (password.length() < 6) {
-      password = "0" + password; // If the number has less than 6 digits, prepend 0s to it
-    }
-    Keyboard.println(password);
-
-    short_blink();
-
-    delay(10000);  // Wait for 10 seconds before typing the next password
-
-    currentPassword++; // Increase the password by 1
+  if(incrementationIsRunning) {
+    increment();
   }
-  else {
-    while(1) {} // Stop the program once all passwords have been typed
-  }
+
+  delay(1000);
 }
