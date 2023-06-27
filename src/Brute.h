@@ -9,7 +9,7 @@ class Brute {
   public:
     Brute();
     void increment();
-    bool incrementationIsRunning = true;
+    bool incrementationIsRunning = false;
     int currentPassword = 0;
 };
 

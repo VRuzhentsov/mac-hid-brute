@@ -1,6 +1,4 @@
-#include "Arduino.h"
-#include <ESP8266mDNS.h>
-
+#include "mdnsSetup.h"
 
 void setupMDNS() {
   // Set up mDNS responder:

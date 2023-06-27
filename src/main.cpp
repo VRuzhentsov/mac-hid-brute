@@ -34,8 +34,10 @@ void setup()
   short_blink();
   Serial.print("IP: "); Serial.println(WiFi.localIP());
 
-  setupMDNS();
+  MDNS.begin("rpipicow");
   httpServer.setup();
+
+  MDNS.addService("http", "tcp", 80);
 
   delay(5000);
 }
@@ -45,8 +47,8 @@ void loop()
   if(brute.incrementationIsRunning) {
     brute.increment();
   }
-  updateMDNS();
   httpServer.update();
+  MDNS.update();
 
   delay(1000);
 }
