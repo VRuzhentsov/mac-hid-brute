@@ -1,60 +1,52 @@
-/**
- * Blink
- *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
- */
 #include "Arduino.h"
 #include "Keyboard.h"
+#include <ESP8266WiFi.h>
+#include "mdnsSetup.h"
+#include "HttpWebServer.h"
+#include "utils.h"
+#include "Brute.h"
 
 #include "WifiCredentials.h"
 
-#ifndef LED_BUILTIN
-#define LED_BUILTIN 13
-#endif
+char wifi_ssid[] = WIFI_SSID;
+char wifi_password[] = WIFI_PASSWORD;
 
-int currentPassword = 0;
-bool incrementationIsRunning = true;
-
-void short_blink() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(100);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-}
-
-void increment(){
-  if(currentPassword <= 999999) {
-    String password = String(currentPassword);
-    while (password.length() < 6) {
-      password = "0" + password; // If the number has less than 6 digits, prepend 0s to it
-    }
-    Keyboard.println(password);
-
-    short_blink();
-
-    delay(10000);
-
-    currentPassword++; // Increase the password by 1
-  } else {
-    incrementationIsRunning = false;
-  }
-}
+HttpWebServer httpServer;
+Brute brute;
 
 void setup()
 {
+  short_blink();
   // initialize LED digital pin as an output.
   pinMode(LED_BUILTIN, OUTPUT);
   Keyboard.begin();
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifi_ssid, wifi_password);
+
+  short_blink();
+  Serial.print("Connecting to WiFi.");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println("");
+  short_blink();
+  Serial.print("IP: "); Serial.println(WiFi.localIP());
+
+  setupMDNS();
+  httpServer.setup();
 
   delay(5000);
 }
 
 void loop()
 {
-  if(incrementationIsRunning) {
-    increment();
+  if(brute.incrementationIsRunning) {
+    brute.increment();
   }
+  updateMDNS();
+  httpServer.update();
 
   delay(1000);
 }
