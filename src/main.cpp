@@ -1,7 +1,6 @@
 #include "Arduino.h"
 #include "Keyboard.h"
 #include <ESP8266WiFi.h>
-#include "mdnsSetup.h"
 #include "HttpWebServer.h"
 #include "utils.h"
 #include "Brute.h"
@@ -38,6 +37,8 @@ void setup()
   httpServer.setup();
 
   MDNS.addService("http", "tcp", 80);
+
+  brute.incrementationIsRunning = true;
 
   delay(5000);
 }
